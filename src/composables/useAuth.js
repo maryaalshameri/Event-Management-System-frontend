@@ -1,47 +1,55 @@
-// src/composables/useAuth.js
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import api from '@/services/api'
 
 export function useAuth() {
-  const store = useStore()
   const router = useRouter()
-  const loading = ref(false)
-  const error = ref('')
-
-  // معلومات المستخدم
+  const store = useStore()
   const user = ref(null)
+  const loading = ref(true)
 
-  // جلب بيانات المستخدم من API باستخدام التوكن
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get('/api/v1/me') // تأكد من endpoint المستخدم
-      user.value = response.data
-    } catch (err) {
-      console.error('Failed to fetch user:', err)
-      user.value = null
-    }
-  }
+  onMounted(async () => {
+    await loadUserData()
+  })
 
-  const logout = async () => {
-    loading.value = true
-    error.value = ''
+  const loadUserData = async () => {
     try {
-      await store.dispatch('logout')
-      user.value = null
-      router.push('/')
-    } catch (e) {
-      error.value = 'حدث خطأ أثناء تسجيل الخروج'
+      const token = localStorage.getItem('token')
+      if (token) {
+        const response = await api.get('/me')
+        user.value = response.data.data
+        localStorage.setItem('user', JSON.stringify(response.data.data))
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
     } finally {
       loading.value = false
     }
   }
 
-  // جلب بيانات المستخدم عند تحميل composable
-  onMounted(() => {
-    fetchUser()
-  })
+  const logout = async () => {
+    try {
+      await store.dispatch('logout')
+      user.value = null
+      router.push('/')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
-  return { logout, loading, error, user, fetchUser }
+  const updateUser = (userData) => {
+    user.value = userData
+    localStorage.setItem('user', JSON.stringify(userData))
+  }
+
+  return {
+    user,
+    loading,
+    logout,
+    updateUser,
+    loadUserData
+  }
 }
