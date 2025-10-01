@@ -88,7 +88,8 @@
               <td class="px-4 py-3">
                 <div class="flex items-center">
                   <img 
-                    :src="user.avatar || '/images/default-avatar.png'" 
+                    :src="`http://127.0.0.1:8000/storage/${user.avatar}`"
+                     
                     :alt="user.name"
                     class="h-10 w-10 rounded-full object-cover ml-3"
                   />
