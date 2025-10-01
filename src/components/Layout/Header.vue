@@ -22,18 +22,23 @@
               @click="toggleDropdown"
               class="cursor-pointer flex items-center gap-2 select-none"
             >
-              <img
-                v-if="user?.avatar"
-                :src="user.avatar"
-                class="w-8 h-8 rounded-full"
-                alt="صورة المستخدم"
-              />
-              <div
-                v-else
-                class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
-              >
-                {{ user?.name?.charAt(0) || '?' }}
+              <!-- صورة البروفايل أو الحرف الأول -->
+              <div class="relative">
+                <img
+                  v-if="user?.avatar"
+                  :src="user.avatar"
+                  class="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm"
+                  alt="صورة المستخدم"
+                />
+                <div
+                  v-else
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm"
+                  :class="getUserAvatarColor(user?.name)"
+                >
+                  {{ getUserInitials(user?.name) }}
+                </div>
               </div>
+              
               <span class="hidden sm:block text-gray-700 dark:text-gray-200 font-medium">
                 {{ user?.name || 'جاري التحميل...' }}
               </span>
@@ -144,6 +149,47 @@ export default {
       user.value = newUser
     }, { immediate: true })
 
+    // دالة لاستخراج الأحرف الأولى من الاسم
+    const getUserInitials = (name) => {
+      if (!name) return '?'
+      
+      // استخراج أول حرف من كل كلمة (الاسم الأول والأخير)
+      const names = name.split(' ')
+      if (names.length === 1) {
+        return names[0].charAt(0).toUpperCase()
+      } else {
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase()
+      }
+    }
+
+    // دالة لتحديد لون الخلفية بناءً على الاسم
+    const getUserAvatarColor = (name) => {
+      if (!name) return 'bg-indigo-600'
+      
+      // إنشاء لون ثابت بناءً على الاسم
+      const colors = [
+        'bg-indigo-600',
+        'bg-pink-600',
+        'bg-purple-600',
+        'bg-blue-600',
+        'bg-green-600',
+        'bg-yellow-600',
+        'bg-red-600',
+        'bg-teal-600',
+        'bg-orange-600',
+        'bg-cyan-600'
+      ]
+      
+      // استخدام الاسم لتحديد اللون بشكل ثابت
+      let hash = 0
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      
+      const index = Math.abs(hash) % colors.length
+      return colors[index]
+    }
+
     const toggleDropdown = () => {
       dropdownOpen.value = !dropdownOpen.value
       if (!dropdownOpen.value) settingsOpen.value = false
@@ -213,8 +259,38 @@ export default {
       closeEditProfileModal,
       closeChangePasswordModal,
       handleProfileUpdated,
-      handlePasswordUpdated
+      handlePasswordUpdated,
+      getUserInitials,
+      getUserAvatarColor
     }
   }
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@media (max-width: 768px) {
+  .fade-enter-from,
+  .fade-leave-to {
+    transform: translateY(-20px);
+  }
+}
+
+/* تأثيرات إضافية للصورة */
+.avatar-container {
+  transition: all 0.3s ease;
+}
+
+.avatar-container:hover {
+  transform: scale(1.05);
+}
+</style>
