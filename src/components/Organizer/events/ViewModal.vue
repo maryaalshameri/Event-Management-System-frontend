@@ -17,8 +17,8 @@
         <!-- صورة الفعالية -->
         <div class="text-center">
           <img 
-            :src="event.image || '/placeholder-image.jpg'" 
-            :alt="event.title"
+            :src="`http://127.0.0.1:8000/storage/${event.image}`"
+            :alt="event?.title || 'فعالية'"
             class="h-48 w-full object-cover rounded-lg mx-auto"
           >
         </div>
