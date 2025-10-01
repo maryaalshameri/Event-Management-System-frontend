@@ -68,14 +68,16 @@
         <!-- الجانب الأيمن -->
         <div class="space-y-6">
           <!-- الصورة -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 overflow-hidden">
-            <img 
-              :src="event?.image || '/placeholder-image.jpg'" 
-              :alt="event?.title"
-              class="w-full h-48 object-cover"
+          <div 
+              class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 overflow-hidden"
+              v-if="event && event.image"
             >
-          </div>
-
+              <img 
+                :src="`http://127.0.0.1:8000/storage/${event.image}`"
+                :alt="event?.title || 'فعالية'"
+                class="w-full h-48 object-cover"
+              >
+            </div>
           <!-- المواعيد -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">المواعيد</h3>

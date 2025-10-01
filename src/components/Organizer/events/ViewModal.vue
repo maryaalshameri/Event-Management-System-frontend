@@ -10,15 +10,15 @@
 
       <div v-if="loading" class="text-center py-4">
         <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
-        <p class="mt-2">جاري تحميل البيانات...</p>
+        <p class="mt-2">جاري تحميل البيانات....</p>
       </div>
 
       <div v-else-if="event" class="space-y-4">
         <!-- صورة الفعالية -->
         <div class="text-center">
           <img 
-            :src="event.image || '/placeholder-image.jpg'" 
-            :alt="event.title"
+            :src="`http://127.0.0.1:8000/storage/${event.image}`"
+            :alt="event?.title || 'فعالية'"
             class="h-48 w-full object-cover rounded-lg mx-auto"
           >
         </div>
