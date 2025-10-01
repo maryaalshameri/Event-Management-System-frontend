@@ -76,8 +76,11 @@
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center">
-                  <img :src="event.image || '/placeholder-image.jpg'" :alt="event.title" class="h-10 w-10 rounded object-cover ml-3">
-                  <div>
+                 <img
+                  :src="`http://127.0.0.1:8000/storage/${event.image}`"
+                  :alt="event?.title || 'فعالية'"
+                  class="h-10 w-10 rounded object-cover ml-3"                />
+                                  <div>
                     <p class="font-medium text-gray-900 dark:text-white">{{ event.title }}</p>
                     <p class="text-sm text-gray-500">{{ getCategoryText(event.category) }}</p>
                   </div>
