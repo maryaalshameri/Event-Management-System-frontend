@@ -10,7 +10,7 @@
 
       <div v-if="loading" class="text-center py-4">
         <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
-        <p class="mt-2">جاري تحميل البيانات...</p>
+        <p class="mt-2">جاري تحميل البيانات....</p>
       </div>
 
       <div v-else-if="event" class="space-y-4">
