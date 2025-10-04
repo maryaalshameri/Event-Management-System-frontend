@@ -9,6 +9,7 @@ import AttendeesDashboard from '@/views/attendees/AttendeesDashboard.vue'
 import OrganizerDashboard from '@/views/organizer/OrganizerDashboard.vue'
 import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 import Welcome from '@/views/Welcome.vue'
+import ForgotPassword from '@/views/ForgotPassword.vue'
 
 const routes = [
   { path: '/', name: 'Welcome', component: Welcome },
@@ -16,6 +17,12 @@ const routes = [
   { path: '/register', name: 'Register', component: Register, meta: { guest: true } },
   // { path: '/attendees/dashboard', name: 'AttendeesDashboard', component: AttendeesDashboard, meta: { requiresAuth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/login' }, // أي مسار غير معروف
+   { 
+    path: '/forgot-password', 
+    name: 'ForgotPassword', 
+    component: ForgotPassword,
+    meta: { guest: true }
+  },
 
 
  {
@@ -105,28 +112,36 @@ const routes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/organizer/Dashboard.vue')
+        component: () => import('@/views/organizer/Dashboard.vue'),
+          meta: { title: 'لوحة التحكم' }
       },
       {
         path: 'events',
         name: 'OrganizerEvents',
-        component: () => import('@/views/organizer/Events.vue')
+        component: () => import('@/views/organizer/Events.vue'),
+          meta: { title: ' فعالياتي' }
       },
   
       {
         path: 'orders',
         name: 'OrganizerOrders',
-        component: () => import('@/views/organizer/Orders.vue')
+        component: () => import('@/views/organizer/Orders.vue'),
+          meta: { title: ' ادارة الطلبات' }
       },
       {
         path: 'events/:id/attendees',
         name: 'OrganizerAttendees',
-        component: () => import('@/views/organizer/Attendees.vue')
+        component: () => import('@/views/organizer/Attendees.vue'),
+          meta: { title: ' الحضور' }
       },
+       { path: "settings", name: "OrganizerSettings",
+         component: ()  => import("@/views/organizer/Settings.vue"),
+          meta: { title: "الإعدادات" } },
       {
         path: 'reports',
         name: 'OrganizerReports',
-        component: () => import('@/views/organizer/Reports.vue')
+        component: () => import('@/views/organizer/Reports.vue'),
+          meta: { title: 'التقارير ' }
       },
       // إعادة توجيه المسار الأساسي إلى dashboard
       { path: '', redirect: { name: 'Dashboard' } }
