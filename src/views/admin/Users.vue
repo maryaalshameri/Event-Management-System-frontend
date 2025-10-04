@@ -1,7 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">إدارة المستخدمين</h1>
       <button 
         @click="addUser" 
         class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center"
