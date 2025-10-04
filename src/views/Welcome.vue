@@ -10,7 +10,7 @@
               <i class="fas fa-calendar-alt text-white text-lg"></i>
             </div>
             <span class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              EventHub
+              MaryEvent
             </span>
           </div>
 
@@ -61,7 +61,7 @@
           <div class="animate-float">
             <h1 class="text-6xl md:text-8xl font-black mb-8">
               <span class="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
-                EventHub
+                MaryEvent
               </span>
             </h1>
           </div>
@@ -108,7 +108,7 @@
           <div class="text-center mb-20">
             <h2 class="text-5xl font-bold text-white mb-6">
               لماذا تختار 
-              <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">EventHub</span>؟
+              <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">MaryEvent</span>؟
             </h2>
             <p class="text-xl text-gray-400 max-w-3xl mx-auto">
               نقدم لك تجربة فريدة تجمع بين البساطة والقوة في عالم تنظيم الفعاليات
@@ -215,7 +215,7 @@
                 <i class="fas fa-calendar-alt text-white text-xl"></i>
               </div>
               <span class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                EventHub
+                MaryEvent
               </span>
             </div>
             <p class="text-gray-400 mb-6 max-w-md leading-relaxed">
@@ -264,7 +264,7 @@
         <!-- حقوق النشر -->
         <div class="border-t border-white/10 pt-8 text-center">
           <p class="text-gray-400">
-            © 2024 EventHub. جميع الحقوق محفوظة. 
+            © 2024 MaryEvent. جميع الحقوق محفوظة. 
             <span class="text-purple-400">صنع بكل ❤️ للمجتمع</span>
           </p>
         </div>
@@ -329,7 +329,7 @@ export default {
         name: 'أحمد محمد',
         initials: 'أم',
         role: 'منظم فعاليات',
-        comment: 'منصة EventHub غيرت طريقة تنظيمي للفعاليات بشكل كامل. الأدوات المتقدمة والدعم الرائع جعلوا عملي أسهل بكثير.'
+        comment: 'منصة MaryEvent غيرت طريقة تنظيمي للفعاليات بشكل كامل. الأدوات المتقدمة والدعم الرائع جعلوا عملي أسهل بكثير.'
       },
       {
         id: 2,

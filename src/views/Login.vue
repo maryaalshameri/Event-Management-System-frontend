@@ -1,120 +1,164 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <!-- شعار -->
-      <div class="text-center mb-8">
-        <div class="logo-container">
-          <svg xmlns="http://www.w3.org/2000/svg" class="logo-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-        </div>
-        <h1 class="login-title">تسجيل الدخول</h1>
-        <p class="login-subtitle">أدخل بياناتك للوصول إلى حسابك</p>
-        <p class="register-link">
-          أو 
-          <router-link to="/register">إنشاء حساب جديد</router-link>
-        </p>
-      </div>
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-100 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 p-4">
+    <!-- خلفية متحركة -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+      <div class="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
 
-      <!-- رسالة الخطأ -->
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
-
-      <!-- نموذج تسجيل الدخول -->
-      <form class="login-form" @submit.prevent="handleLogin">
-        <!-- حقل البريد الإلكتروني -->
-        <div class="form-group">
-          <label for="email" class="form-label">البريد الإلكتروني</label>
-          <div class="input-container">
-            <div class="input-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <input 
-              id="email" 
-              v-model="form.email" 
-              type="email" 
-              required 
-              placeholder="أدخل بريدك الإلكتروني"
-              :class="['form-input', errors.email ? 'error' : '']"
-            >
+    <div class="w-full max-w-md relative z-10">
+      <!-- البطاقة الرئيسية -->
+      <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden transition-all duration-500 hover:shadow-3xl">
+        
+        <!-- الهيدر -->
+        <div class="relative bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 p-8 text-center">
+          <div class="absolute top-4 right-4">
+            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
           </div>
-          <p v-if="errors.email" class="error-text">{{ errors.email[0] }}</p>
+          
+          <!-- الشعار -->
+          <div class="w-24 h-24 mx-auto mb-4 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
+            <div class="w-16 h-16 bg-white/30 rounded-xl flex items-center justify-center">
+              <i class="fas fa-lock text-white text-2xl"></i>
+            </div>
+          </div>
+          
+          <h1 class="text-3xl font-bold text-white mb-2">
+            تسجيل الدخول
+          </h1>
+          <p class="text-blue-100 text-sm">
+            أهلاً بعودتك! أدخل بياناتك للوصول إلى حسابك
+          </p>
         </div>
 
-        <!-- حقل كلمة المرور -->
-        <div class="form-group">
-          <label for="password" class="form-label">كلمة المرور</label>
-          <div class="input-container">
-            <button 
-              type="button"
-              @click="togglePasswordVisibility"
-              class="password-toggle"
+        <!-- المحتوى -->
+        <div class="p-8">
+          <!-- رسائل التنبيه -->
+          <div v-if="error" class="alert-error animate-fade-in mb-6">
+            <i class="fas fa-exclamation-triangle ml-2"></i>
+            {{ error }}
+          </div>
+
+          <!-- نموذج تسجيل الدخول -->
+          <form @submit.prevent="handleLogin" class="space-y-6">
+            <!-- حقل البريد الإلكتروني -->
+            <div class="form-group-animated">
+              <label class="form-label">
+                <i class="fas fa-envelope ml-2 text-purple-500"></i>
+                البريد الإلكتروني
+              </label>
+              <div class="input-container-glow group">
+                <i class="fas fa-envelope input-icon group-focus-within:text-purple-500"></i>
+                <input
+                  v-model="form.email"
+                  type="email"
+                  required
+                  class="input-field peer"
+                  placeholder="أدخل بريدك الإلكتروني"
+                  :class="errors.email ? 'border-red-500' : ''"
+                >
+                <div class="glow-effect"></div>
+              </div>
+              <p v-if="errors.email" class="error-text">
+                <i class="fas fa-exclamation-circle ml-1"></i>
+                {{ errors.email[0] }}
+              </p>
+            </div>
+
+            <!-- حقل كلمة المرور -->
+            <div class="form-group-animated">
+              <label class="form-label">
+                <i class="fas fa-lock ml-2 text-blue-500"></i>
+                كلمة المرور
+              </label>
+              <div class="input-container-glow group relative">
+                <i class="fas fa-lock input-icon group-focus-within:text-blue-500"></i>
+                <input
+                  v-model="form.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  required
+                  class="input-field peer pr-12"
+                  placeholder="أدخل كلمة المرور"
+                  :class="errors.password ? 'border-red-500' : ''"
+                >
+                <button
+                  type="button"
+                  @click="togglePasswordVisibility"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                >
+                  <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+                <div class="glow-effect"></div>
+              </div>
+              <p v-if="errors.password" class="error-text">
+                <i class="fas fa-exclamation-circle ml-1"></i>
+                {{ errors.password[0] }}
+              </p>
+            </div>
+
+            <!-- تذكرني ونسيت كلمة المرور -->
+            <div class="flex justify-between items-center">
+              <label class="remember-checkbox">
+                <input
+                  v-model="form.remember"
+                  type="checkbox"
+                  class="checkbox"
+                >
+                <span class="checkmark"></span>
+                <span class="remember-text">
+                  <i class="fas fa-check ml-1"></i>
+                  تذكرني
+                </span>
+              </label>
+              
+              <router-link to="/forgot-password" class="forgot-link">
+                <i class="fas fa-key ml-1"></i>
+                نسيت كلمة المرور؟
+              </router-link>
+            </div>
+
+            <!-- زر تسجيل الدخول -->
+            <button
+              type="submit"
+              :disabled="loading"
+              class="login-btn w-full transform transition-all duration-300 hover:scale-105 group relative overflow-hidden"
             >
-              <svg 
-                v-if="showPassword" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <svg 
-                v-else 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m9.02 9.02l3.83 3.83" />
-              </svg>
+              <div class="flex items-center justify-center">
+                <i v-if="!loading" class="fas fa-sign-in-alt ml-2 group-hover:scale-110 transition-transform"></i>
+                <i v-else class="fas fa-spinner fa-spin ml-2"></i>
+                {{ loading ? 'جاري تسجيل الدخول...' : 'دخول إلى الحساب' }}
+              </div>
+              <div class="btn-shine"></div>
+              <div class="btn-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+              </div>
             </button>
-            
-            <div class="input-icon left">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+
+            <!-- رابط إنشاء حساب جديد -->
+            <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+              <p class="text-gray-600 dark:text-gray-400 text-sm">
+                ليس لديك حساب؟ 
+                <router-link to="/register" class="register-link">
+                  <i class="fas fa-user-plus ml-1"></i>
+                  إنشاء حساب جديد
+                </router-link>
+              </p>
             </div>
-            
-            <input 
-              id="password" 
-              v-model="form.password" 
-              :type="showPassword ? 'text' : 'password'" 
-              required 
-              placeholder="أدخل كلمة المرور"
-              :class="['form-input', errors.password ? 'error' : '']"
-            >
-          </div>
-          <p v-if="errors.password" class="error-text">{{ errors.password[0] }}</p>
+          </form>
         </div>
 
-        <!-- تذكرني - نسيت كلمة المرور -->
-        <div class="form-options">
-          <div class="remember-me">
-            <input 
-              id="remember" 
-              v-model="form.remember" 
-              type="checkbox" 
-              class="checkbox"
-            >
-            <label for="remember">تذكرني</label>
-          </div>
-          <a href="#" class="forgot-password">نسيت كلمة المرور؟</a>
+        <!-- الفوتر -->
+        <div class="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-blue-900/20 px-8 py-4 text-center border-t border-gray-200 dark:border-gray-600">
+          <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center space-x-2 space-x-reverse">
+            <i class="fas fa-shield-alt text-green-500"></i>
+            <span>نظام آمن ومشفر</span>
+            <i class="fas fa-lock text-blue-500"></i>
+          </p>
         </div>
-
-        <!-- زر تسجيل الدخول -->
-        <button 
-          type="submit" 
-          :disabled="loading"
-          class="login-button"
-        >
-          {{ loading ? 'جاري تسجيل الدخول...' : 'دخول' }}
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -125,6 +169,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 export default {
+  name: 'Login',
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -147,16 +192,22 @@ export default {
       loading.value = true
       error.value = ''
       errors.value = {}
+      
       try {
         await store.dispatch('login', form.value)
         const role = store.getters.userRole
-        if (role === 'organizer') {
-          router.push('/organizer/dashboard')
-        } else if (role === 'admin') {
-          router.push('/admin/dashboard')
-        } else {
-          router.push('/attendee/events')
-        }
+        
+        // توجيه حسب الدور مع تأثيرات
+        setTimeout(() => {
+          if (role === 'organizer') {
+            router.push('/organizer/dashboard')
+          } else if (role === 'admin') {
+            router.push('/admin/dashboard')
+          } else {
+            router.push('/attendee/events')
+          }
+        }, 1000)
+        
       } catch (err) {
         console.error('Login error:', err)
         if (err.response?.data?.errors) {
@@ -182,336 +233,86 @@ export default {
 }
 </script>
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  /* font-family: 'Tajawal', sans-serif; */
-}
-</style>
-
 <style scoped>
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* أنيميشن مخصص */
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
-.dark .login-container {
-  background: linear-gradient(135deg, #1e3a8a 0%, #581c87 100%);
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
-.login-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(200%) rotate(45deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.shadow-3xl {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 25px -5px rgba(168, 85, 247, 0.3),
+    0 0 50px -12px rgba(59, 130, 246, 0.3);
+}
+
+/* أنماط مخصصة */
+
+.particle:nth-child(1) {
+  top: 20%; left: 10%;
+  animation: float 3s ease-in-out infinite;
+}
+
+.particle:nth-child(2) {
+  top: 60%; left: 80%;
+  animation: float 3s ease-in-out infinite 1s;
+}
+
+.particle:nth-child(3) {
+  top: 40%; left: 40%;
+  animation: float 3s ease-in-out infinite 2s;
+}
+
+
+
+
+
+/* تحسينات الوضع الداكن */
+.dark .input-field {
+  background: rgba(55, 65, 81, 0.8);
 }
 
 .dark .login-card {
-  background: rgba(17, 24, 39, 0.95);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-.login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-.dark .login-card:hover {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-}
-
-.logo-container {
-  width: 4rem;
-  height: 4rem;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-}
-
-.dark .logo-container {
-  background: rgba(99, 102, 241, 0.2);
-}
-
-.logo-icon {
-  width: 2rem;
-  height: 2rem;
-  color: #4f46e5;
-}
-
-.dark .logo-icon {
-  color: #818cf8;
-}
-
-.login-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-.dark .login-title {
-  color: #f9fafb;
-}
-
-.login-subtitle {
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-}
-
-.dark .login-subtitle {
-  color: #d1d5db;
-}
-
-.register-link {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.dark .register-link {
-  color: #d1d5db;
-}
-
-.register-link a {
-  color: #4f46e5;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.dark .register-link a {
-  color: #818cf8;
-}
-
-.register-link a:hover {
-  color: #3730a3;
-}
-
-.dark .register-link a:hover {
-  color: #a5b4fc;
-}
-
-.error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
-  animation: shake 0.5s ease-in-out;
-}
-
-.dark .error-message {
-  background: #450a0a;
-  border-color: #7f1d1d;
-  color: #fca5a5;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-}
-
-.dark .form-label {
-  color: #d1d5db;
-}
-
-.input-container {
-  position: relative;
-}
-
-.input-icon {
-  position: absolute;
-  top: 50%;
-  right: 0.75rem;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  pointer-events: none;
-}
-
-.input-icon.left {
-  right: auto;
-  left: 0.75rem;
-}
-
-.input-icon svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 0.75rem;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 0.25rem;
-  transition: color 0.2s;
-}
-
-.password-toggle:hover {
-  color: #6b7280;
-}
-
-.dark .password-toggle:hover {
-  color: #d1d5db;
-}
-
-.password-toggle svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.form-input {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: white;
-  transition: all 0.3s;
-  font-size: 1rem;
-}
-
-.dark .form-input {
-  background: #374151;
-  border-color: #4b5563;
-  color: #f9fafb;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-}
-
-.dark .form-input:focus {
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-}
-
-.form-input.error {
-  border-color: #dc2626;
-}
-
-.dark .form-input.error {
-  border-color: #ef4444;
-}
-
-.error-text {
-  color: #dc2626;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.dark .error-text {
-  color: #fca5a5;
-}
-
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.checkbox {
-  width: 1rem;
-  height: 1rem;
-  color: #4f46e5;
-  border-color: #d1d5db;
-  border-radius: 0.25rem;
-}
-
-.dark .checkbox {
-  border-color: #6b7280;
-  background: #374151;
-}
-
-.remember-me label {
-  font-size: 0.875rem;
-  color: #374151;
-}
-
-.dark .remember-me label {
-  color: #d1d5db;
-}
-
-.forgot-password {
-  font-size: 0.875rem;
-  color: #4f46e5;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.dark .forgot-password {
-  color: #818cf8;
-}
-
-.forgot-password:hover {
-  color: #3730a3;
-}
-
-.dark .forgot-password:hover {
-  color: #a5b4fc;
-}
-
-.login-button {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.login-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-}
-
-.login-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  background: rgba(17, 24, 39, 0.8);
 }
 </style>
