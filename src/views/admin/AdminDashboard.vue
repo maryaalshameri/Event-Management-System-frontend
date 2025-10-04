@@ -1,15 +1,17 @@
 <template>
-  <div class="flex flex-col md:flex-row min-h-screen">
-    <!-- Admin Sidebar -->
-    <AdminSidebar />
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Header -->
+    <HeaderComponent :title="currentTitle" />
     
-    <!-- المحتوى الرئيسي -->
-    <div class="flex-1 min-h-screen bg-gray-50 dark:bg-gray-900 md:mr-64 pb-16 md:pb-0">
-      <HeaderComponent :title="currentTitle" />
+    <div class="flex">
+      <!-- Sidebar للشاشات الكبيرة -->
+      <AdminSidebar />
       
-      <!-- المحتوى الديناميكي -->
-      <main class="pt-20 px-4 sm:px-6 lg:px-8">
-        <router-view></router-view>
+      <!-- المحتوى الرئيسي - أضفنا z-index أقل -->
+      <main class="flex-1 min-h-screen transition-all duration-300 md:mr-80 z-10">
+        <div class="pt-24 pb-20 md:pb-8 px-4 sm:px-6 lg:px-8">
+          <router-view></router-view>
+        </div>
       </main>
     </div>
   </div>

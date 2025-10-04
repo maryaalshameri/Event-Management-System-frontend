@@ -1,6 +1,5 @@
 <template>
   <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">لوحة تحكم المدير</h1>
     
     <!-- الإحصائيات -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

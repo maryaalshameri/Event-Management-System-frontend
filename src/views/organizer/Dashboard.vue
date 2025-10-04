@@ -1,8 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">لوحة تحكم المنظم</h1>
-      <p class="text-gray-600 dark:text-gray-400">نظرة عامة على فعالياتك وأدائك</p>
+      <h1 class="text-gray-600 dark:text-gray-400">نظرة عامة على فعالياتك وأدائك</h1>
     </div>
 
     <!-- إحصائيات سريعة -->
