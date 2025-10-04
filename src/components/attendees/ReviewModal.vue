@@ -1,6 +1,11 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md shadow-2xl">
+  <Modal 
+    :show="show" 
+    :max-width="'md'"
+    :closeable="true"
+    @close="close"
+  >
+    <div class="bg-white dark:bg-gray-800 rounded-xl w-full">
       <!-- الرأس -->
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-700 dark:to-gray-600">
         <div class="flex items-center">
@@ -81,11 +86,12 @@
         </button>
       </div>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import Modal from '@/components/Shared/Modal.vue'
 import api from '@/services/api'
 import { showToast } from '@/utils/toast'
 
