@@ -1,121 +1,210 @@
 <template>
-  <header class="bg-white dark:bg-gray-800 shadow-sm fixed w-full z-50 right-0">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <!-- عنوان -->
-        <div>
-          <span class="text-lg md:text-xl font-bold text-indigo-600 dark:text-indigo-400">
-            {{ title }}
-          </span>
+ <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-sm border-b border-gray-200 dark:border-gray-700 fixed w-full z-50 right-0 transition-all duration-500">    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-20 items-center">
+        <!-- العنوان والمسار -->
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <!-- زر القائمة للموبايل -->
+          <button @click="toggleSidebar" class="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white text-xl">
+            <i class="fas fa-bars"></i>
+          </button>
+          
+          <!-- العنوان -->
+          <div class="flex flex-col">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              {{ title }}
+            </h1>
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <i class="fas fa-home ml-1 text-xs"></i>
+              <span>لوحة التحكم</span>
+              <i class="fas fa-chevron-left mx-2 text-xs"></i>
+              <span class="text-gray-700 dark:text-gray-300">{{ title }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- أيقونات -->
-        <div class="flex items-center gap-4 relative">
+        <div class="flex items-center gap-6">
+          <!-- البحث -->
+          <div class="relative hidden md:block">
+            <div class="input-container-glow group">
+              <i class="fas fa-search input-icon group-focus-within:text-purple-500"></i>
+              <input
+                type="text"
+                placeholder="بحث..."
+                class="input-field-search"
+                v-model="searchQuery"
+              >
+              <div class="glow-effect"></div>
+            </div>
+          </div>
+
+          <!-- الإشعارات -->
+          <div class="relative">
+            <button 
+              @click="toggleNotifications"
+              class="header-icon-btn relative"
+              :class="{ 'header-icon-btn-active': notificationsOpen }"
+            >
+              <i class="fas fa-bell"></i>
+              <span v-if="unreadNotifications > 0" class="notification-badge">
+                {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+              </span>
+            </button>
+
+            <!-- قائمة الإشعارات -->
+            <transition name="fade-scale">
+              <div 
+                v-if="notificationsOpen"
+                class="notifications-dropdown"
+              >
+                <div class="notifications-header">
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-white">الإشعارات</h3>
+                  <button class="text-sm text-purple-600 hover:text-purple-700">تعيين الكل كمقروء</button>
+                </div>
+                
+                <div class="notifications-list">
+                  <div 
+                    v-for="notification in notifications" 
+                    :key="notification.id"
+                    class="notification-item"
+                    :class="{ 'unread': !notification.read }"
+                  >
+                    <div class="notification-icon">
+                      <i :class="notification.icon" class="text-white"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p class="notification-text">{{ notification.message }}</p>
+                      <span class="notification-time">{{ notification.time }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="notifications-footer">
+                  <button class="view-all-btn">عرض جميع الإشعارات</button>
+                </div>
+              </div>
+            </transition>
+          </div>
+
           <!-- الوضع الليلي -->
-          <button @click="toggleDarkMode" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white text-xl">
+          <button 
+            @click="toggleDarkMode" 
+            class="header-icon-btn"
+            :class="{ 'header-icon-btn-active': isDark }"
+          >
             <i :class="isDark ? 'fas fa-sun' : 'fas fa-moon'"></i>
           </button>
 
           <!-- البروفايل -->
-          <div class="relative" v-if="!authLoading">
-            <div
-              @click="toggleDropdown"
-              class="cursor-pointer flex items-center gap-2 select-none"
+          <div class="relative">
+            <button
+              @click="toggleProfileDropdown"
+              class="profile-btn group"
+              :class="{ 'profile-btn-active': profileDropdownOpen }"
             >
-              <!-- صورة البروفايل أو الحرف الأول -->
-              <div class="relative">
+              <div class="avatar-container">
                 <img
                   v-if="user?.avatar"
-                  :src="user.avatar"
-                  class="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm"
+                   :src="`http://127.0.0.1:8000/storage/${user.avatar}`"
+                  class="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-lg"
                   alt="صورة المستخدم"
                 />
                 <div
                   v-else
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm"
+                  class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
                   :class="getUserAvatarColor(user?.name)"
                 >
                   {{ getUserInitials(user?.name) }}
                 </div>
               </div>
               
-              <span class="hidden sm:block text-gray-700 dark:text-gray-200 font-medium">
-                {{ user?.name || 'جاري التحميل...' }}
-              </span>
-              <i class="fas fa-caret-down text-gray-500"></i>
-            </div>
+              <div class="profile-info">
+                <span class="profile-name">{{ user?.name || 'جاري التحميل...' }}</span>
+                <span class="profile-role"> {{ user?.role }}</span>
+              </div>
+              
+              <i class="fas fa-chevron-down profile-arrow transition-transform duration-300"></i>
+            </button>
 
             <!-- Dropdown -->
-            <transition name="fade">
+            <transition name="fade-scale">
               <div
-                v-if="dropdownOpen"
-                class="absolute md:right-0 md:mt-2 md:w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg py-2 z-50 w-screen left-0 md:left-auto top-16 md:top-auto"
+                v-if="profileDropdownOpen"
+                class="profile-dropdown"
               >
-                <!-- الإعدادات -->
-                <button
-                  @click="toggleSettingsDropdown"
-                  class="w-full flex justify-between items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                >
-                  الإعدادات
-                  <i :class="settingsOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-                </button>
-
-                <!-- Sub-dropdown -->
-                <transition name="fade">
-                  <div
-                    v-if="settingsOpen"
-                    class="border-t border-gray-200 dark:border-gray-600"
-                  >
-                    <button
-                      @click="openEditProfileModal"
-                      class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    >
-                      تعديل البيانات الشخصية
-                    </button>
-                    <button
-                      @click="openChangePasswordModal"
-                      class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    >
-                      تغيير كلمة المرور
-                    </button>
+                <!-- رأس البروفايل -->
+                <div class="profile-dropdown-header">
+                  <div class="flex items-center space-x-3 space-x-reverse gap-3">
+                    <div class="avatar-container">
+                      <img
+                        v-if="user?.avatar"
+                        :src="user.avatar"
+                        class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-lg"
+                        alt="صورة المستخدم"
+                      />
+                      <div
+                        v-else
+                        class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg"
+                        :class="getUserAvatarColor(user?.name)"
+                      >
+                        {{ getUserInitials(user?.name) }}
+                      </div>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800 dark:text-white">{{ user?.name }}</p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">مدير النظام</p>
+                    </div>
                   </div>
-                </transition>
+                </div>
 
-                <!-- تسجيل خروج -->
-                <button
-                  @click="logout"
-                  class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                >
-                  تسجيل الخروج
-                </button>
+                <!-- القائمة -->
+                <div class="profile-dropdown-menu">
+                  <button @click="openEditProfileModal" class="dropdown-item">
+                    <i class="fas fa-user-edit dropdown-icon ml-3"></i>
+                    <span>تعديل الملف الشخصي</span>
+                  </button>
+                  
+                  <button @click="openChangePasswordModal" class="dropdown-item">
+                    <i class="fas fa-lock dropdown-icon ml-3"></i>
+                    <span>تغيير كلمة المرور</span>
+                  </button>
+                  
+                  <button class="dropdown-item">
+                    <i class="fas fa-cog dropdown-icon ml-3"></i>
+                    <span>الإعدادات</span>
+                  </button>
+                  
+                  <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+                  
+                  <button @click="logout" class="dropdown-item text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <i class="fas fa-sign-out-alt dropdown-icon ml-3"></i>
+                    <span>تسجيل الخروج</span>
+                  </button>
+                </div>
               </div>
             </transition>
-          </div>
-
-          <!-- تحميل -->
-          <div v-else class="flex items-center gap-2">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-            <span class="text-gray-500 text-sm">جاري التحميل...</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- مودال تعديل البيانات الشخصية -->
-    <EditProfileModal 
-      v-if="showEditProfileModal"
-      :user="user"
-      @close="closeEditProfileModal"
-      @saved="handleProfileUpdated"
-    />
+    <!-- المودالات -->
 
-    <!-- مودال تغيير كلمة المرور -->
-    <ChangePasswordModal 
-      v-if="showChangePasswordModal"
-      @close="closeChangePasswordModal"
-      @saved="handlePasswordUpdated"
-    />
   </header>
+
+
+   <EditProfileModal 
+    v-if="showEditProfileModal"
+    :user="user"
+    @close="closeEditProfileModal"
+    @saved="handleProfileUpdated"
+  />
+
+  <ChangePasswordModal 
+    v-if="showChangePasswordModal"
+    @close="closeChangePasswordModal"
+    @saved="handlePasswordUpdated"
+  />
 </template>
 
 <script>
@@ -133,27 +222,48 @@ export default {
   },
   setup() {
     const { user: authUser, logout: authLogout, loading: authLoading, updateUser } = useAuth()
-    const dropdownOpen = ref(false)
-    const settingsOpen = ref(false)
+    const { isDark, toggleDarkMode } = useDarkMode()
+    
+    const searchQuery = ref('')
+    const notificationsOpen = ref(false)
+    const profileDropdownOpen = ref(false)
     const showEditProfileModal = ref(false)
     const showChangePasswordModal = ref(false)
     const user = ref(null)
-    const { isDark, toggleDarkMode } = useDarkMode()
+
+    // بيانات الإشعارات
+    const notifications = ref([
+      { id: 1, message: 'مستخدم جديد قام بالتسجيل', time: 'منذ 5 دقائق', read: false, icon: 'fas fa-user-plus' },
+      { id: 2, message: 'تم إنشاء فعالية جديدة', time: 'منذ ساعة', read: false, icon: 'fas fa-calendar-plus' },
+      { id: 3, message: 'طلب جديد يحتاج للموافقة', time: 'منذ 3 ساعات', read: true, icon: 'fas fa-shopping-cart' },
+      { id: 4, message: 'تقرير المبيعات جاهز', time: 'منذ يوم', read: true, icon: 'fas fa-chart-bar' }
+    ])
+
+    const unreadNotifications = ref(2)
 
     onMounted(() => {
       document.addEventListener('click', handleClickOutside)
+      document.body.classList.remove('modal-open')
     })
 
-    // مراقبة تغييرات المستخدم
     watch(authUser, (newUser) => {
       user.value = newUser
     }, { immediate: true })
 
-    // دالة لاستخراج الأحرف الأولى من الاسم
+
+
+    watch([showEditProfileModal, showChangePasswordModal], ([editOpen, passwordOpen]) => {
+  if (editOpen || passwordOpen) {
+    document.body.classList.add('modal-open')
+  } else {
+    document.body.classList.remove('modal-open')
+  }
+})
+
+
+
     const getUserInitials = (name) => {
       if (!name) return '?'
-      
-      // استخراج أول حرف من كل كلمة (الاسم الأول والأخير)
       const names = name.split(' ')
       if (names.length === 1) {
         return names[0].charAt(0).toUpperCase()
@@ -162,53 +272,46 @@ export default {
       }
     }
 
-    // دالة لتحديد لون الخلفية بناءً على الاسم
     const getUserAvatarColor = (name) => {
-      if (!name) return 'bg-indigo-600'
-      
-      // إنشاء لون ثابت بناءً على الاسم
+      if (!name) return 'bg-gradient-to-r from-purple-500 to-blue-500'
       const colors = [
-        'bg-indigo-600',
-        'bg-pink-600',
-        'bg-purple-600',
-        'bg-blue-600',
-        'bg-green-600',
-        'bg-yellow-600',
-        'bg-red-600',
-        'bg-teal-600',
-        'bg-orange-600',
-        'bg-cyan-600'
+        'bg-gradient-to-r from-purple-500 to-blue-500',
+        'bg-gradient-to-r from-pink-500 to-rose-500',
+        'bg-gradient-to-r from-green-500 to-teal-500',
+        'bg-gradient-to-r from-orange-500 to-red-500',
+        'bg-gradient-to-r from-indigo-500 to-purple-500'
       ]
-      
-      // استخدام الاسم لتحديد اللون بشكل ثابت
       let hash = 0
       for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash)
       }
-      
       const index = Math.abs(hash) % colors.length
       return colors[index]
     }
 
-    const toggleDropdown = () => {
-      dropdownOpen.value = !dropdownOpen.value
-      if (!dropdownOpen.value) settingsOpen.value = false
+    const toggleNotifications = () => {
+      notificationsOpen.value = !notificationsOpen.value
+      if (notificationsOpen.value) profileDropdownOpen.value = false
     }
 
-    const toggleSettingsDropdown = () => {
-      settingsOpen.value = !settingsOpen.value
+    const toggleProfileDropdown = () => {
+      profileDropdownOpen.value = !profileDropdownOpen.value
+      if (profileDropdownOpen.value) notificationsOpen.value = false
+    }
+
+    const toggleSidebar = () => {
+      // إضافة دالة لتبديل السايدبار للموبايل
+      emit('toggle-sidebar')
     }
 
     const openEditProfileModal = () => {
       showEditProfileModal.value = true
-      dropdownOpen.value = false
-      settingsOpen.value = false
+      profileDropdownOpen.value = false
     }
 
     const openChangePasswordModal = () => {
       showChangePasswordModal.value = true
-      dropdownOpen.value = false
-      settingsOpen.value = false
+      profileDropdownOpen.value = false
     }
 
     const closeEditProfileModal = () => {
@@ -230,36 +333,38 @@ export default {
 
     const logout = () => {
       authLogout()
-      dropdownOpen.value = false
-      settingsOpen.value = false
+      profileDropdownOpen.value = false
     }
 
     const handleClickOutside = (event) => {
-      const dropdown = document.querySelector('.relative')
-      if (dropdown && !dropdown.contains(event.target)) {
-        dropdownOpen.value = false
-        settingsOpen.value = false
+      if (!event.target.closest('.relative')) {
+        notificationsOpen.value = false
+        profileDropdownOpen.value = false
       }
     }
 
     return { 
-      logout, 
-      dropdownOpen, 
-      settingsOpen, 
-      toggleDropdown, 
-      toggleSettingsDropdown, 
-      isDark, 
-      toggleDarkMode, 
-      user,
-      authLoading,
+      searchQuery,
+      notificationsOpen,
+      profileDropdownOpen,
       showEditProfileModal,
       showChangePasswordModal,
+      isDark,
+      toggleDarkMode,
+      user,
+      authLoading,
+      notifications,
+      unreadNotifications,
+      toggleNotifications,
+      toggleProfileDropdown,
+      toggleSidebar,
       openEditProfileModal,
       openChangePasswordModal,
       closeEditProfileModal,
       closeChangePasswordModal,
       handleProfileUpdated,
       handlePasswordUpdated,
+      logout,
       getUserInitials,
       getUserAvatarColor
     }
@@ -268,29 +373,26 @@ export default {
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-@media (max-width: 768px) {
-  .fade-enter-from,
-  .fade-leave-to {
-    transform: translateY(-20px);
+/* أنيميشن مخصص */
+@keyframes fade-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
-/* تأثيرات إضافية للصورة */
-.avatar-container {
-  transition: all 0.3s ease;
+.fade-scale-enter-active {
+  animation: fade-scale 0.2s ease-out;
 }
 
-.avatar-container:hover {
-  transform: scale(1.05);
+.fade-scale-leave-active {
+  animation: fade-scale 0.15s ease-in reverse;
 }
+
+/* أنماط الهيدر */
+
 </style>
