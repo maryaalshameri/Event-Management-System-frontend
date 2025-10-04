@@ -1,6 +1,11 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm shadow-2xl">
+  <Modal 
+    :show="show" 
+    :max-width="'sm'"
+    :closeable="true"
+    @close="close"
+  >
+    <div class="bg-white dark:bg-gray-800 rounded-xl w-full">
       <!-- الرأس -->
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600">
         <div class="flex items-center">
@@ -19,14 +24,21 @@
 
       <!-- المحتوى -->
       <div class="p-6">
-        <!-- رمز QR -->
+        <!-- رمز QR الحقيقي -->
         <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 mb-4 flex justify-center">
           <div class="bg-white p-4 rounded-lg shadow-inner">
-            <!-- محاكاة لرمز QR - يمكن استبدالها بمكتبة حقيقية -->
-            <div class="grid grid-cols-8 gap-1 w-64 h-64 mx-auto">
-              <div v-for="i in 64" :key="i" 
-                   class="rounded-sm transition-all duration-300 hover:scale-110"
-                   :class="Math.random() > 0.5 ? 'bg-black' : 'bg-white border border-gray-200'"></div>
+            <canvas 
+              ref="qrCanvas" 
+              class="w-64 h-64 mx-auto"
+              :class="{ 'opacity-50': generatingQR }"
+            ></canvas>
+            
+            <!-- حالة التحميل -->
+            <div v-if="generatingQR" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 rounded-lg">
+              <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-indigo-600 text-2xl mb-2"></i>
+                <p class="text-sm text-gray-600">جاري توليد QR...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -50,6 +62,12 @@
             <span class="font-medium px-2 py-1 rounded-full text-xs" 
                   :class="ticket?.used_at ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'">
               {{ ticket?.used_at ? 'مستخدمة' : 'نشطة' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center" v-if="ticket?.event">
+            <span class="text-gray-600 dark:text-gray-400">الفعالية:</span>
+            <span class="font-medium text-gray-900 dark:text-white text-left max-w-[150px] truncate">
+              {{ ticket.event.title }}
             </span>
           </div>
         </div>
@@ -76,7 +94,7 @@
         </button>
         <button
           @click="downloadQRCode"
-          :disabled="downloading"
+          :disabled="downloading || generatingQR"
           class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-xl transition-all duration-200 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
         >
           <i v-if="downloading" class="fas fa-spinner fa-spin ml-2"></i>
@@ -85,11 +103,13 @@
         </button>
       </div>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
+import QRCode from 'qrcode'
+import Modal from '@/components/Shared/Modal.vue'
 import api from '@/services/api'
 import { showToast } from '@/utils/toast'
 
@@ -100,14 +120,73 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+const qrCanvas = ref(null)
 const downloading = ref(false)
+const generatingQR = ref(false)
 
 const close = () => {
   emit('close')
 }
 
+// توليد QR code عند فتح المودال أو تغيير التذكرة
+watch(() => props.show, async (newVal) => {
+  if (newVal && props.ticket && qrCanvas.value) {
+    await generateQRCode()
+  }
+})
+
+// توليد QR code عند تغيير التذكرة
+watch(() => props.ticket, async (newTicket) => {
+  if (props.show && newTicket && qrCanvas.value) {
+    await generateQRCode()
+  }
+})
+
+const generateQRCode = async () => {
+  if (!props.ticket?.code || !qrCanvas.value) return
+
+  generatingQR.value = true
+
+  try {
+    // بيانات QR - يمكنك تعديلها حسب احتياجاتك
+    const qrData = JSON.stringify({
+      ticketId: props.ticket.id,
+      ticketCode: props.ticket.code,
+      eventId: props.ticket.event?.id,
+      type: 'event_ticket',
+      timestamp: new Date().toISOString()
+    })
+
+    // إعدادات QR code
+    const options = {
+      width: 256,
+      height: 256,
+      margin: 2,
+      color: {
+        dark: '#000000',  // لون النقاط
+        light: '#FFFFFF' // لون الخلفية
+      },
+      errorCorrectionLevel: 'H' // High error correction
+    }
+
+    // توليد QR code على Canvas
+    await QRCode.toCanvas(qrCanvas.value, qrData, options, (error) => {
+      if (error) {
+        console.error('Error generating QR code:', error)
+        showToast('خطأ', 'فشل في توليد رمز QR', 'error')
+      }
+    })
+
+  } catch (error) {
+    console.error('Error in QR generation:', error)
+    showToast('خطأ', 'فشل في توليد رمز QR', 'error')
+  } finally {
+    generatingQR.value = false
+  }
+}
+
 const downloadQRCode = async () => {
-  if (!props.ticket?.id) {
+  if (!qrCanvas.value || !props.ticket?.code) {
     showToast('خطأ', 'لا يمكن تحميل صورة QR', 'error')
     return
   }
@@ -115,19 +194,16 @@ const downloadQRCode = async () => {
   downloading.value = true
 
   try {
-    const response = await api.get(`/attendee/tickets/${props.ticket.id}/download-qr`, {
-      responseType: 'blob'
-    })
-
+    // تحويل Canvas إلى صورة
+    const dataURL = qrCanvas.value.toDataURL('image/png')
+    
     // إنشاء رابط تحميل
-    const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `qr-${props.ticket.code}.png`)
+    link.href = dataURL
+    link.download = `ticket-qr-${props.ticket.code}.png`
     document.body.appendChild(link)
     link.click()
-    link.remove()
-    window.URL.revokeObjectURL(url)
+    document.body.removeChild(link)
 
     showToast('نجاح', 'تم تحميل صورة QR بنجاح', 'success')
   } catch (error) {
@@ -142,8 +218,18 @@ const getTicketTypeText = (name) => {
   const types = {
     'regular': 'عادية',
     'vip': 'VIP',
-    'premium': 'بريميوم'
+    'premium': 'بريميوم',
+    'standard': 'قياسية',
+    'gold': 'ذهبية'
   }
   return types[name] || name
 }
 </script>
+
+<style scoped>
+/* تأثيرات إضافية للـ QR */
+canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+</style>

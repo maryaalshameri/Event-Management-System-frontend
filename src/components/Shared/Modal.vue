@@ -1,23 +1,27 @@
 <template>
   <Transition 
-    enter-active-class="transition ease-out duration-200" 
-    enter-from-class="opacity-0" 
-    enter-to-class="opacity-100"
-    leave-active-class="transition ease-in duration-100" 
-    leave-from-class="opacity-100" 
-    leave-to-class="opacity-0"
+    enter-active-class="transition ease-out duration-300" 
+    enter-from-class="opacity-0 scale-95" 
+    enter-to-class="opacity-100 scale-100"
+    leave-active-class="transition ease-in duration-200" 
+    leave-from-class="opacity-100 scale-100" 
+    leave-to-class="opacity-0 scale-95"
   >
-    <div v-show="show" class="fixed inset-0 z-50 overflow-y-auto">
+    <div v-show="show" class="fixed inset-0 z-[9999] overflow-y-auto">
       <!-- الخلفية الشفافة -->
-      <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" @click="close"></div>
+      <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="close"></div>
       
-      <!-- محتوى المودال -->
-      <div class="flex min-h-full items-center justify-center p-4">
+      <!-- محتوى المودال مع إمكانية التمرير -->
+      <div class="flex min-h-full items-center justify-center p-4" :style="modalStyle">
         <div 
-          class="relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all w-full"
+          class="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all w-full z-[10000] flex flex-col"
           :class="maxWidthClass"
+          :style="contentStyle"
         >
-          <slot></slot>
+          <!-- محتوى المودال القابل للتمرير -->
+          <div class="flex-1 overflow-y-auto">
+            <slot></slot>
+          </div>
         </div>
       </div>
     </div>
@@ -25,7 +29,7 @@
 </template>
 
 <script>
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
 
 export default {
   props: {
@@ -36,22 +40,85 @@ export default {
     maxWidth: {
       type: String,
       default: '2xl'
+    },
+    closeable: {
+      type: Boolean,
+      default: true
+    },
+    scrollable: {
+      type: Boolean,
+      default: true
+    },
+    maxHeight: {
+      type: String,
+      default: 'calc(100vh - 8rem)' // حساب ديناميكي
+    },
+    headerOffset: {
+      type: Number,
+      default: 80 // ارتفاع الهيدر التقريبي
     }
   },
   emits: ['close'],
   setup(props, { emit }) {
+    const headerHeight = ref(props.headerOffset)
+
     const close = () => {
-      emit('close')
+      if (props.closeable) {
+        emit('close')
+      }
     }
 
     const closeOnEscape = (e) => {
-      if (e.key === 'Escape' && props.show) {
+      if (e.key === 'Escape' && props.show && props.closeable) {
         close()
       }
     }
 
-    onMounted(() => document.addEventListener('keydown', closeOnEscape))
-    onUnmounted(() => document.removeEventListener('keydown', closeOnEscape))
+    // حساب ارتفاع الهيدر الفعلي
+    const calculateHeaderHeight = () => {
+      const header = document.querySelector('header')
+      if (header) {
+        headerHeight.value = header.offsetHeight + 20 // +20 للتباعد الإضافي
+      }
+    }
+
+    // إدارة scroll الجسم عند فتح/إغلاق المودال
+    watch(() => props.show, (newValue) => {
+      if (newValue) {
+        document.body.classList.add('modal-open')
+        document.addEventListener('keydown', closeOnEscape)
+        calculateHeaderHeight()
+      } else {
+        document.body.classList.remove('modal-open')
+        document.removeEventListener('keydown', closeOnEscape)
+      }
+    })
+
+    const modalStyle = computed(() => {
+      return {
+        paddingTop: `${headerHeight.value}px`,
+        paddingBottom: `${headerHeight.value}px`
+      }
+    })
+
+    const contentStyle = computed(() => {
+      return {
+        maxHeight: props.maxHeight
+      }
+    })
+
+    onMounted(() => {
+      if (props.show) {
+        document.body.classList.add('modal-open')
+        document.addEventListener('keydown', closeOnEscape)
+        calculateHeaderHeight()
+      }
+    })
+
+    onUnmounted(() => {
+      document.body.classList.remove('modal-open')
+      document.removeEventListener('keydown', closeOnEscape)
+    })
 
     const maxWidthClass = computed(() => {
       return {
@@ -60,36 +127,20 @@ export default {
         'lg': 'sm:max-w-lg',
         'xl': 'sm:max-w-xl',
         '2xl': 'sm:max-w-2xl',
+        '3xl': 'sm:max-w-3xl',
+        '4xl': 'sm:max-w-4xl',
+        '5xl': 'sm:max-w-5xl',
+        '6xl': 'sm:max-w-6xl',
+        '7xl': 'sm:max-w-7xl',
       }[props.maxWidth]
     })
 
     return {
       close,
-      maxWidthClass
+      maxWidthClass,
+      modalStyle,
+      contentStyle
     }
   }
 }
 </script>
-
-<style scoped>
-/* تأكد من أن المودال فوق كل شيء */
-.fixed {
-  position: fixed;
-}
-
-.inset-0 {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.z-50 {
-  z-index: 50;
-}
-
-/* منع scroll على body عندما يكون المودال مفتوحاً */
-body.modal-open {
-  overflow: hidden;
-}
-</style>
