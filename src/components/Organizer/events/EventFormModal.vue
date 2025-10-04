@@ -1,6 +1,6 @@
 <template>
   <Modal :show="show" @close="close">
-    <div class="p-6 max-h-screen overflow-y-auto">
+    <div class="p-6 max-h-screen">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-bold text-gray-900 dark:text-white">
           {{ isEdit ? 'تعديل الفعالية' : 'إنشاء فعالية جديدة' }}
@@ -302,7 +302,7 @@
         </div>
 
         <!-- أزرار الإجراءات -->
-        <div class="flex justify-end space-x-2 space-x-reverse pt-4 gap-4">
+        <div class="flex justify-end space-x-2 space-x-reverse pt-4 gap-4 py-3">
           <button
             type="button"
             @click="close"
